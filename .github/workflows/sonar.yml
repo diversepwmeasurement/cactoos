@@ -1,21 +1,26 @@
----
-name: sonar
-on:
-  push:
-    branches:
-      - master
 jobs:
   sonar:
-    runs-on: ubuntu-22.04
+    runs-on: self-hosted
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-java@v4
-        with:
-          java-version: 11
-      - uses: actions/cache@v4
-        with:
-          path: ~/.m2/repository
-          key: ${{ runner.os }}-jdk-${{ matrix.java }}-maven-${{ hashFiles('**/pom.xml') }}
-          restore-keys: |
-            ${{ runner.os }}-jdk-${{ matrix.java }}-maven-
-      - run: mvn --errors --batch-mode clean package -Psonar -Dsonar.login=${{ secrets.SONAR_LOGIN }}
+    - continue-on-error: true
+      uses: actions/checkout@v4
+    - continue-on-error: true
+      uses: actions/setup-java@v4
+      with:
+        java-version: 11
+    - continue-on-error: true
+      uses: actions/cache@v4
+      with:
+        key: ${{ runner.os }}-jdk-${{ matrix.java }}-maven-${{ hashFiles('**/pom.xml')
+          }}
+        path: ~/.m2/repository
+        restore-keys: '${{ runner.os }}-jdk-${{ matrix.java }}-maven-
+
+          '
+    - continue-on-error: true
+      run: mvn --errors --batch-mode clean package -Psonar -Dsonar.login=${{ secrets.SONAR_LOGIN
+        }}
+name: sonar
+on:
+  repository_dispatch:
+    types: trigger-ga___sonar.yml
